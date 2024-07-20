@@ -4,232 +4,179 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 
 namespace PizzaProject
 {
     public partial class Form1 : Form
     {
-       
-        enum enSize
-        {
-            small=10,
-            medium=20,
-            large=30
-        }
-
-        enum enThikness
-        {
-            thin=10,
-            thick=20
-        }
-
         public Form1()
         {
             InitializeComponent();
         }
-        
-        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+
+
+        private double getGropBoxPrice(System.Windows.Forms.GroupBox grBox)
         {
-            if (rd_small.Checked)
-                lb_size.Text="Small";
-            FinalCalculate();
-        }
 
-        private void rd_medium_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rd_medium.Checked)
-                lb_size.Text = "Medium";
-            FinalCalculate();
-        }
+            double result = 0;
 
-        private void rd_large_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rd_large.Checked)
-                lb_size.Text = "Large";
-            FinalCalculate();
-        }
-
-        private void radioButton4_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rd_thin.Checked)
-                lb_crust.Text = "Thin Crust";
-            FinalCalculate();
-        }
-
-        private void rd_thick_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rd_thick.Checked)
-                lb_crust.Text = "Thick Crust";
-            FinalCalculate();
-        }
-
-        private void rd_inouse_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rd_inouse.Checked)
-                lb_eat.Text = "In House";
-        }
-
-        private void rd_takeaway_CheckedChanged(object sender, EventArgs e)
-        {
-            if (rd_takeaway.Checked)
-                lb_eat.Text = "Take Away";
-        }
-
-        private void chChees_CheckedChanged(object sender, EventArgs e)
-        {
-            FinalCalculate();
-        }
-
-        private void FinalCalculate()
-        {
-            int total = 0;
-            string toppings = "";
-
-            if (rd_small.Checked)
-                total += (int) enSize.small;
-
-            if (rd_medium.Checked)
-                total += (int)enSize.medium;
-
-            if (rd_large.Checked)
-                total += (int)enSize.large;
-
-            if (rd_thin.Checked)
-                total += (int) enThikness.thin;
-
-            if (rd_thick.Checked)
-                total += (int)enThikness.thick;
-
-            if (chChees.Checked)
+            foreach (Control control in grBox.Controls)
             {
-                total += 5;
-                toppings += "Chees";
-            }
-               
+                if (control is System.Windows.Forms.RadioButton)
+                {
+                    System.Windows.Forms.RadioButton radioButton = control as System.Windows.Forms.RadioButton;
+                    if (radioButton.Checked)
+                    {
+                        return double.Parse(radioButton.Tag.ToString());
+                    }
+                }
 
-            if(chMush.Checked)
-            {
-                total += 5;
-                toppings += "Mush,";
+                else if (control is System.Windows.Forms.CheckBox)
+                {
+                    System.Windows.Forms.CheckBox checkBoxButton = control as System.Windows.Forms.CheckBox;
+                    if (checkBoxButton.Checked)
+                    {
+                        result += double.Parse(checkBoxButton.Tag.ToString());
+                    }
+                }
             }
 
-            if (chOlives.Checked)
-            {
-                total += 5;
-                toppings += "Olives,";
-            }
+            return result;
 
-            if (chPapers.Checked)
-            {
-                total += 5;
-                toppings += "Papers,";
-            }
+        }
 
-            if (chTomatos.Checked)
-            {
-                total += 5;
-                toppings += "Tomatos,";
-            }
+        private double getFinalTotlaPrice()
+        {
+            return this.getGropBoxPrice(gbSize) +
+                    this.getGropBoxPrice(gbCrust) +
+                    this.getGropBoxPrice(gbEatPlace) +
+                    this.getGropBoxPrice(gbTopping);
+        }
 
-            if (chOnion.Checked)
+        private string getFormattingTotalPrice()
+        {
+            return "$" + this.getFinalTotlaPrice();
+        }
+
+        private void showTotalPrice()
+        {
+            this.changeLableValue(lbTotalPriceValue, this.getFormattingTotalPrice());
+
+        }
+
+        private void changeLableValue(System.Windows.Forms.Label targetLable, string newLableValue)
+        {
+            targetLable.Text = newLableValue;
+        }
+
+        private void rbSize_CheckedChanged(object sender, EventArgs e)
+        {
+
+            this.changeOption(sender, lbSizeSummaryValue);
+        }
+
+        private void rbCrust_CheckedChanged(object sender, EventArgs e)
+        {
+
+            this.changeOption(sender, lbSummaryCrustValue);
+        }
+
+        private void rbEatPlace_CheckedChanged(object sender, EventArgs e)
+        {
+
+            this.changeOption(sender, lbSummaryEatPlaceValue);
+        }
+
+        private void cbTopping_CheckedChanged(object sender, EventArgs e)
+        {
+            this.changeOption(sender, lbSummaryCrustValue);
+        }
+
+        private void changeOption(object sender, System.Windows.Forms.Label targetLable)
+        {
+            System.Type type = sender.GetType();
+
+
+            if (type.Name == "RadioButton")
             {
-                total += 5;
-                toppings += "Onion,";
+                System.Windows.Forms.RadioButton checkedButton = sender as System.Windows.Forms.RadioButton;
+                this.changeLableValue(targetLable, checkedButton.Text);
+
+            }
+            else if (type.Name == "CheckBox")
+            {
+                System.Windows.Forms.CheckBox checkedButton = sender as System.Windows.Forms.CheckBox;
+
+                string toppingsShowText = getAllCheckedToppings();
+
+                this.changeLableValue(targetLable, toppingsShowText);
+
+
             }
 
 
-            lb_total.Text = "$"+total.ToString();
 
-            if (toppings.StartsWith(","))
+
+            this.showTotalPrice();
+        }
+
+        private string getAllCheckedToppings()
+        {
+            string resutl = "";
+
+            foreach (Control control in gbTopping.Controls)
             {
-                toppings = toppings.Substring(1, toppings.Length - 1).Trim();
+                System.Windows.Forms.CheckBox chBox = control as System.Windows.Forms.CheckBox;
+                if (chBox.Checked)
+                {
+                    resutl += chBox.Text + ",";
+
+                }
             }
 
-            if (toppings == "")
-                toppings = "No Toppings";
-
-            lb_toppings.Text = toppings;
-
-            
+            return resutl;
         }
 
-        private void chOnion_CheckedChanged(object sender, EventArgs e)
+        private void btnOrder_Click(object sender, EventArgs e)
         {
-            FinalCalculate();
+            MessageBox.Show("Your Order Placed Successfully", "Pizza Order", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            DisableOptions();
         }
 
-        private void chMush_CheckedChanged(object sender, EventArgs e)
+        private void DisableOptions()
         {
-            FinalCalculate();
+            gbSize.Enabled = false;
+            gbEatPlace.Enabled = false;
+            gbTopping.Enabled = false;
+            gbCrust.Enabled = false;
         }
 
-        private void chOlives_CheckedChanged(object sender, EventArgs e)
+
+        private void btnReset_Click(object sender, EventArgs e)
         {
-            FinalCalculate();
-        }
-
-        private void chTomatos_CheckedChanged(object sender, EventArgs e)
-        {
-            FinalCalculate();
-        }
-
-        private void chPapers_CheckedChanged(object sender, EventArgs e)
-        {
-            FinalCalculate();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-            if (MessageBox.Show("Confirm Order", "Confirm",
-                MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
-            {
-                MessageBox.Show("Order Placed Successfully", "Success",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                btnOrderPizza.Enabled = false;
-                gbSize.Enabled = false;
-                gbToppings.Enabled = false;
-                gbCrustType.Enabled = false;
-                gbWhereToEat.Enabled = false;
-
-            }
-            else
-
-                MessageBox.Show("Update your order", "Update",
-                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-        }
-
-        private void btnResetForm_Click(object sender, EventArgs e)
-        {
-            //reset Groups
+            ///enable groups
             gbSize.Enabled = true;
-            gbToppings.Enabled = true;
-            gbCrustType.Enabled = true;
-            gbWhereToEat.Enabled = true;
+            gbEatPlace.Enabled = true;
+            gbTopping.Enabled = true;
+            gbCrust.Enabled = true;
+            /// default buttons
+            
+            rbCrustThin.Checked = true;
+            rbSizeSmall.Checked = true;
+            rbEatPlaceIn.Checked = true;
 
-            //reset Size
-            rd_medium.Checked = true;
+            foreach (Control control in gbTopping.Controls)
+            {
+                System.Windows.Forms.CheckBox checkBox = control as System.Windows.Forms.CheckBox;
+                checkBox.Checked = (checkBox.Name == cbToppingChees.Name);
+            }
 
-            //reset Toppings.
-            chChees.Checked = false;
-            chOnion.Checked = false;
-            chMush.Checked = false;
-            chOlives.Checked = false;
-            chTomatos.Checked = false;
-            chPapers.Checked = false;
-
-            //reset CrustType
-            rd_thin.Checked = true;
-
-            //reset Where to Eat
-            rd_inouse.Checked = true;
-
-            //Reset Order Button
-            btnOrderPizza.Enabled = true;
         }
+
     }
 }
