@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PizzaProject.Properties
+namespace PizzaProjectNew.Properties
 {
 
 

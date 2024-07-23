@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B14B3BD6-894C-4978-B7F4-96C051B9435B}</ProjectGuid>
+    <ProjectGuid>{EBC0C8BB-E407-4171-B524-A33FEE05CA9A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>PizzaProject</RootNamespace>
-    <AssemblyName>PizzaProject</AssemblyName>
+    <RootNamespace>PizzaProjectNew</RootNamespace>
+    <AssemblyName>PizzaProjectNew</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

@@ -4,179 +4,156 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 
-namespace PizzaProject
+namespace PizzaProjectNew
 {
-    public partial class Form1 : Form
+    public partial class Pizza4You : Form
     {
-        public Form1()
+        public Pizza4You()
         {
             InitializeComponent();
         }
 
-
-        private double getGropBoxPrice(System.Windows.Forms.GroupBox grBox)
+        private void rb_size_changed(object sender, EventArgs e)
         {
 
+            changeOption(sender, summerySize);
+        }
+        private void changeOption(object sender, Label TargetLabel) {
+
+            System.Type type = sender.GetType();
+            if (type.Name == "RadioButton")
+            {
+                RadioButton radioButton = (RadioButton)sender;
+                this.changeLabel(radioButton.Text, TargetLabel);
+
+            }else if (type.Name == "CheckBox")
+            {
+                string CheckedToppings = getAllCheckedToppings();
+                this.changeLabel(CheckedToppings,TargetLabel);
+            }
+
+            this.showTotalPrice();
+        }
+        private string getFormattedTotalPrice()
+        {
+
+            return "$"+ getFinalTotalPrice();
+        }
+        private double getFinalTotalPrice() {
+
+            return this.getGropBoxPrice(gbSize) +
+                   this.getGropBoxPrice(gbCrust) +
+                   this.getGropBoxPrice(gbEat) +
+                   this.getGropBoxPrice(gbToppings);
+        }
+        private double getGropBoxPrice(GroupBox GroupBox)
+        {
             double result = 0;
 
-            foreach (Control control in grBox.Controls)
+            foreach(Control control in GroupBox.Controls)
             {
-                if (control is System.Windows.Forms.RadioButton)
+                if(control is RadioButton)
                 {
-                    System.Windows.Forms.RadioButton radioButton = control as System.Windows.Forms.RadioButton;
-                    if (radioButton.Checked)
+                    RadioButton radio = (RadioButton)control;
+                    if (radio.Checked)
                     {
-                        return double.Parse(radioButton.Tag.ToString());
+                        return Convert.ToDouble(radio.Tag);
                     }
                 }
-
-                else if (control is System.Windows.Forms.CheckBox)
+                else if (control is CheckBox)
                 {
-                    System.Windows.Forms.CheckBox checkBoxButton = control as System.Windows.Forms.CheckBox;
-                    if (checkBoxButton.Checked)
+                    CheckBox CheckBox = (CheckBox)control;
+                    if (CheckBox.Checked)
                     {
-                        result += double.Parse(checkBoxButton.Tag.ToString());
+                        result += Convert.ToDouble(CheckBox.Tag);
+
                     }
                 }
             }
-
             return result;
-
         }
-
-        private double getFinalTotlaPrice()
-        {
-            return this.getGropBoxPrice(gbSize) +
-                    this.getGropBoxPrice(gbCrust) +
-                    this.getGropBoxPrice(gbEatPlace) +
-                    this.getGropBoxPrice(gbTopping);
-        }
-
-        private string getFormattingTotalPrice()
-        {
-            return "$" + this.getFinalTotlaPrice();
-        }
-
         private void showTotalPrice()
         {
-            this.changeLableValue(lbTotalPriceValue, this.getFormattingTotalPrice());
+            this.changeLabel(this.getFormattedTotalPrice(),summeryTotal);
+        }
+        private string getAllCheckedToppings()
+        {
+            string result = "";
+            foreach (Control control in gbToppings.Controls)
+            {
+                CheckBox checkBox = (CheckBox)control;
+                if (checkBox.Checked)
+                {
 
+                    result += checkBox.Text + ",";
+
+                }
+                
+            }
+            return result;
+        }
+        private void changeLabel(string newLabel, Label TargetLabel) {
+
+            TargetLabel.Text = newLabel;
         }
 
-        private void changeLableValue(System.Windows.Forms.Label targetLable, string newLableValue)
+        private void rb_crust_changed(object sender, EventArgs e)
         {
-            targetLable.Text = newLableValue;
+            changeOption(sender, summeryCrust);
         }
 
-        private void rbSize_CheckedChanged(object sender, EventArgs e)
+        private void rb_eat_changed(object sender, EventArgs e)
         {
-
-            this.changeOption(sender, lbSizeSummaryValue);
-        }
-
-        private void rbCrust_CheckedChanged(object sender, EventArgs e)
-        {
-
-            this.changeOption(sender, lbSummaryCrustValue);
-        }
-
-        private void rbEatPlace_CheckedChanged(object sender, EventArgs e)
-        {
-
-            this.changeOption(sender, lbSummaryEatPlaceValue);
+            changeOption(sender, summeryEat);
         }
 
         private void cbTopping_CheckedChanged(object sender, EventArgs e)
         {
-            this.changeOption(sender, lbSummaryCrustValue);
+            changeOption(sender, summeryToppings);
         }
 
-        private void changeOption(object sender, System.Windows.Forms.Label targetLable)
+        private void bReset_Click(object sender, EventArgs e)
         {
-            System.Type type = sender.GetType();
+            DisableGroups(false);
 
+            rbThin.Checked = true;
+            rbMedium.Checked = true;
+            rbInhouse.Checked = true;
 
-            if (type.Name == "RadioButton")
+            foreach (Control control in gbToppings.Controls)
             {
-                System.Windows.Forms.RadioButton checkedButton = sender as System.Windows.Forms.RadioButton;
-                this.changeLableValue(targetLable, checkedButton.Text);
-
-            }
-            else if (type.Name == "CheckBox")
-            {
-                System.Windows.Forms.CheckBox checkedButton = sender as System.Windows.Forms.CheckBox;
-
-                string toppingsShowText = getAllCheckedToppings();
-
-                this.changeLableValue(targetLable, toppingsShowText);
-
-
+                CheckBox checkBox = (CheckBox)control;
+                checkBox.Checked = checkBox.Name == cbChees.Name;
+               
             }
 
-
-
-
-            this.showTotalPrice();
         }
 
-        private string getAllCheckedToppings()
+        private void bOrder_Click(object sender, EventArgs e)
         {
-            string resutl = "";
+            MessageBox.Show("Order Placed Successfully", "Pizza Order", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            DisableGroups(true);
+        }
 
-            foreach (Control control in gbTopping.Controls)
+        private void DisableGroups(bool flag)
+        {
+            if (flag)
             {
-                System.Windows.Forms.CheckBox chBox = control as System.Windows.Forms.CheckBox;
-                if (chBox.Checked)
-                {
-                    resutl += chBox.Text + ",";
-
-                }
+                gbSize.Enabled = false;
+                gbEat.Enabled = false;
+                gbToppings.Enabled = false;
+                gbCrust.Enabled = false;
+                return;
             }
 
-            return resutl;
-        }
-
-        private void btnOrder_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Your Order Placed Successfully", "Pizza Order", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            DisableOptions();
-        }
-
-        private void DisableOptions()
-        {
-            gbSize.Enabled = false;
-            gbEatPlace.Enabled = false;
-            gbTopping.Enabled = false;
-            gbCrust.Enabled = false;
-        }
-
-
-        private void btnReset_Click(object sender, EventArgs e)
-        {
-            ///enable groups
             gbSize.Enabled = true;
-            gbEatPlace.Enabled = true;
-            gbTopping.Enabled = true;
+            gbEat.Enabled = true;
+            gbToppings.Enabled = true;
             gbCrust.Enabled = true;
-            /// default buttons
-            
-            rbCrustThin.Checked = true;
-            rbSizeSmall.Checked = true;
-            rbEatPlaceIn.Checked = true;
-
-            foreach (Control control in gbTopping.Controls)
-            {
-                System.Windows.Forms.CheckBox checkBox = control as System.Windows.Forms.CheckBox;
-                checkBox.Checked = (checkBox.Name == cbToppingChees.Name);
-            }
-
         }
-
     }
 }

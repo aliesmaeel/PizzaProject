@@ -1,11 +1,10 @@
-﻿using PizzaProject;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace PizzaProject
+namespace PizzaProjectNew
 {
     internal static class Program
     {
@@ -17,7 +16,7 @@ namespace PizzaProject
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-        }   
+            Application.Run(new Pizza4You());
+        }
     }
 }
